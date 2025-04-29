@@ -16,12 +16,17 @@
 
 ---
 
+Here’s your tech stack section updated with **badges** to make it visually engaging and professional:
+
+---
+
 ## 🛠️ Tech Stack
 
-- [React Native](https://reactnative.dev/) (Expo)
-- [SQLite](https://docs.expo.dev/versions/latest/sdk/sqlite/) for offline data storage
-- [React Navigation](https://reactnavigation.org/) for screen flow
-- [React Native Paper](https://callstack.github.io/react-native-paper/) for UI components
+[![React Native](https://img.shields.io/badge/React%20Native-20232A?logo=react&logoColor=61DAFB&style=for-the-badge)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-000000?logo=expo&logoColor=white&style=for-the-badge)](https://expo.dev/)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white&style=for-the-badge)](https://docs.expo.dev/versions/latest/sdk/sqlite/)
+[![React Navigation](https://img.shields.io/badge/React%20Navigation-000000?logo=react&logoColor=white&style=for-the-badge)](https://reactnavigation.org/)
+[![React Native Paper](https://img.shields.io/badge/React%20Native%20Paper-6200EE?logo=react&logoColor=white&style=for-the-badge)](https://callstack.github.io/react-native-paper/)
 
 ---
 
