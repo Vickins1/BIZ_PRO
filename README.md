@@ -16,7 +16,12 @@
 
 ---
 
-Here’s your tech stack section updated with **badges** to make it visually engaging and professional:
+## 🛠️ Tech Stack
+
+- [React Native](https://reactnative.dev/) (Expo)
+- [SQLite](https://docs.expo.dev/versions/latest/sdk/sqlite/) for offline data storage
+- [React Navigation](https://reactnavigation.org/) for screen flow
+- [React Native Paper](https://callstack.github.io/react-native-paper/) for UI components
 
 ---
 
