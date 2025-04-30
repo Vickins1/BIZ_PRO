@@ -3,77 +3,70 @@ import { View, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'react-n
 import { Card, Text, ActivityIndicator, Button, Title } from 'react-native-paper';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { fetchSales, initSalesTable, insertSale } from '../database/queries';
+import { useTranslation } from 'react-i18next';
+import { fetchExpenses, initExpensesTable, insertExpense } from '../database/queries';
 
-type Sale = {
+type Expense = {
   id: number;
-  item_name: string;
-  quantity: number;
-  total_price: number;
+  description: string;
+  amount: number;
   created_at: string;
 };
 
-export default function SalesScreen() {
-  const [sales, setSales] = useState<Sale[]>([]);
+export default function ExpensesScreen() {
+  const { t } = useTranslation();
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [itemName, setItemName] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [totalPrice, setTotalPrice] = useState('');
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
 
-  const loadSales = async () => {
+  const loadExpenses = async () => {
     try {
-      await initSalesTable();
-      const data = await fetchSales();
-      setSales(data);
+      await initExpensesTable();
+      const data = await fetchExpenses();
+      setExpenses(data);
     } catch (err) {
-      console.error('❌ Error fetching sales', err);
+      console.error('❌ Error fetching expenses', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddSale = async () => {
+  const handleAddExpense = async () => {
     try {
-      const qty = parseInt(quantity);
-      const price = parseFloat(totalPrice);
-      if (!itemName.trim()) {
-        setError('Item name is required');
+      const amt = parseFloat(amount);
+      if (!description.trim()) {
+        setError(t('errors.descriptionRequired'));
         return;
       }
-      if (isNaN(qty) || qty <= 0) {
-        setError('Quantity must be a positive integer');
-        return;
-      }
-      if (isNaN(price) || price < 0) {
-        setError('Total price must be a valid number');
+      if (isNaN(amt) || amt < 0) {
+        setError(t('errors.amountInvalid'));
         return;
       }
 
-      await insertSale(itemName, qty, price);
-      setItemName('');
-      setQuantity('');
-      setTotalPrice('');
+      await insertExpense(description, amt);
+      setDescription('');
+      setAmount('');
       setError('');
       setModalVisible(false);
-      await loadSales(); // Refresh sales list
+      await loadExpenses();
     } catch (err) {
-      setError('Failed to add sale. Please try again.');
-      console.error('❌ Error adding sale', err);
+      setError(t('errors.addExpenseFailed'));
+      console.error('❌ Error adding expense', err);
     }
   };
 
   useEffect(() => {
-    loadSales();
+    loadExpenses();
   }, []);
 
-  const renderItem = ({ item }: { item: Sale }) => (
+  const renderItem = ({ item }: { item: Expense }) => (
     <Card style={styles.card}>
       <Card.Content>
-        <Text variant="titleMedium" style={styles.itemName}>{item.item_name}</Text>
-        <Text style={styles.detail}>Quantity Sold: {item.quantity}</Text>
-        <Text style={styles.detail}>Total: KES {item.total_price.toFixed(2)}</Text>
+        <Text variant="titleMedium" style={styles.description}>{item.description}</Text>
+        <Text style={styles.detail}>{t('expenses.amount')}: KES {item.amount.toFixed(2)}</Text>
         <Text style={styles.date}>{new Date(item.created_at).toLocaleString()}</Text>
       </Card.Content>
     </Card>
@@ -81,72 +74,62 @@ export default function SalesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <Title style={styles.headerTitle}>Sales Records</Title>
+        <Title style={styles.headerTitle}>{t('expenses.title')}</Title>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setModalVisible(true)}
         >
           <Icon name="add" size={24} color="#fff" />
-          <Text style={styles.addButtonText}>Add Sale</Text>
+          <Text style={styles.addButtonText}>{t('expenses.addExpense')}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Sales List */}
       {loading ? (
         <ActivityIndicator animating={true} size="large" color="#008080" style={styles.loader} />
-      ) : sales.length === 0 ? (
+      ) : expenses.length === 0 ? (
         <View style={styles.emptyState}>
           <Icon name="info-outline" size={48} color="#888" />
-          <Text style={styles.emptyText}>No sales recorded yet.</Text>
+          <Text style={styles.emptyText}>{t('expenses.empty')}</Text>
         </View>
       ) : (
         <FlatList
-          data={sales}
+          data={expenses}
           keyExtractor={item => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
         />
       )}
 
-      {/* Add Sale Modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
         style={styles.modal}
       >
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Add New Sale</Text>
+          <Text style={styles.modalTitle}>{t('expenses.addExpense')}</Text>
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
           <TextInput
             style={styles.input}
-            placeholder="Item Name"
-            value={itemName}
-            onChangeText={setItemName}
+            placeholder={t('expenses.descriptionPlaceholder')}
+            value={description}
+            onChangeText={setDescription}
           />
           <TextInput
             style={styles.input}
-            placeholder="Quantity"
-            value={quantity}
-            onChangeText={setQuantity}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Total Price (KES)"
-            value={totalPrice}
-            onChangeText={setTotalPrice}
+            placeholder={t('expenses.amountPlaceholder')}
+            value={amount}
+            onChangeText={setAmount}
             keyboardType="numeric"
           />
           <View style={styles.modalButtons}>
             <Button
               mode="contained"
-              onPress={handleAddSale}
+              onPress={handleAddExpense}
               style={styles.submitButton}
               labelStyle={styles.buttonLabel}
             >
-              Add Sale
+              {t('expenses.addExpense')}
             </Button>
             <Button
               mode="outlined"
@@ -154,7 +137,7 @@ export default function SalesScreen() {
               style={styles.cancelButton}
               labelStyle={styles.buttonLabel}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </View>
         </View>
@@ -207,7 +190,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  itemName: {
+  description: {
     color: '#333',
     fontWeight: '600',
   },

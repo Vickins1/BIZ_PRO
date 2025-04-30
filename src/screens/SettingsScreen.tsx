@@ -1,53 +1,41 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import { Text, Switch, List, Divider, Button } from 'react-native-paper';
-import Constants from 'expo-constants';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Text, Title, Button } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsScreen() {
-  const [darkMode, setDarkMode] = useState(false);
+  const { t, i18n } = useTranslation();
 
-  const toggleDarkMode = () => {
-    setDarkMode(prev => !prev);
-    // TODO: integrate with global theme later
-  };
-
-  const confirmReset = () => {
-    Alert.alert(
-      'Confirm Reset',
-      'This will delete all inventory and sales data. Are you sure?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Reset', onPress: () => console.log('Reset confirmed') }, // TODO: Hook into database reset
-      ]
-    );
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
   };
 
   return (
     <View style={styles.container}>
-      <List.Section>
-        <List.Subheader>Preferences</List.Subheader>
-
-        <View style={styles.row}>
-          <Text>Dark Mode</Text>
-          <Switch value={darkMode} onValueChange={toggleDarkMode} />
+      <View style={styles.header}>
+        <Title style={styles.headerTitle}>{t('settings.title')}</Title>
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.label}>{t('settings.language')}</Text>
+        <View style={styles.buttonContainer}>
+          <Button
+            mode="contained"
+            onPress={() => changeLanguage('en')}
+            style={styles.languageButton}
+            labelStyle={styles.buttonLabel}
+          >
+            {t('settings.english')}
+          </Button>
+          <Button
+            mode="contained"
+            onPress={() => changeLanguage('sw')}
+            style={styles.languageButton}
+            labelStyle={styles.buttonLabel}
+          >
+            {t('settings.swahili')}
+          </Button>
         </View>
-
-        <Divider />
-
-        <Button
-          mode="contained-tonal"
-          onPress={confirmReset}
-          style={styles.resetBtn}
-        >
-          Reset App Data
-        </Button>
-
-        <Divider />
-
-        <Text style={styles.versionText}>
-          Version: {Constants.expoConfig?.version || '1.0.0'}
-        </Text>
-      </List.Section>
+      </View>
     </View>
   );
 }
@@ -55,20 +43,35 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    padding: 16,
+    backgroundColor: '#008080',
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  content: {
     padding: 16,
   },
-  row: {
+  label: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 8,
+  },
+  buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
+    justifyContent: 'space-around',
   },
-  resetBtn: {
-    marginTop: 16,
+  languageButton: {
+    flex: 1,
+    marginHorizontal: 4,
+    backgroundColor: '#006666',
   },
-  versionText: {
-    marginTop: 32,
-    textAlign: 'center',
-    color: 'gray',
+  buttonLabel: {
+    fontSize: 14,
   },
 });
